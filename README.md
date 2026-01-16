@@ -611,37 +611,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 </div>
 
----
-
-## 📁 Repository Structure
-
-```
-javidnet/
-├── README.md                              # This file
-├── LICENSE                                # MIT License
-├── diagrams/
-│   ├── iran-starlink-architecture.drawio  # Main architecture
-│   ├── iran-starlink-dataflow.drawio      # Data flow
-│   ├── iran-starlink-components.drawio    # Components
-│   ├── iran-starlink-protocol-stack.drawio# Protocol stack
-│   ├── iran-starlink-challenges.drawio    # Challenges
-│   └── iran-starlink-bandwidth.drawio     # Bandwidth analysis
-├── docs/
-│   ├── technical-spec.md                  # Detailed technical specification
-│   ├── security-model.md                  # Security considerations
-│   └── operational-guide.md               # Operational procedures
-├── src/
-│   ├── bridge-server/                     # Bridge server implementation
-│   ├── client/                            # Client application
-│   └── relay-node/                        # Relay node software
-└── research/
-    ├── satellite-bypass.md                # Satellite bypass research
-    ├── traffic-obfuscation.md             # Traffic obfuscation techniques
-    └── related-projects.md                # Related projects and prior art
-```
-
----
-
 <div align="center">
 
 **Built with ❤️ for the people**
