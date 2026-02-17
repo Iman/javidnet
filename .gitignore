@@ -369,3 +369,9 @@ gradle-app.setting
 .vscode
 coverage*[.json, .xml, .info]
 .venv
+/hf-radio-diagrams/farsi/.$*.drawio.bkp
+.$*.drawio.bkp
+*.drawio
+.venv
+*.sh
+/scripts/drawio-to-png.sh

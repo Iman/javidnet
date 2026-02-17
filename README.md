@@ -1,651 +1,260 @@
-# JavidNet - جاویدنت
+# JavidNet
 
 <div align="center">
 
 ```
      ██╗ █████╗ ██╗   ██╗██╗██████╗ ███╗   ██╗███████╗████████╗
      ██║██╔══██╗██║   ██║██║██╔══██╗████╗  ██║██╔════╝╚══██╔══╝
-     ██║███████║██║   ██║██║██║  ██║██╔██╗ ██║█████╗     ██║   
-██   ██║██╔══██║╚██╗ ██╔╝██║██║  ██║██║╚██╗██║██╔══╝     ██║   
-╚█████╔╝██║  ██║ ╚████╔╝ ██║██████╔╝██║ ╚████║███████╗   ██║   
- ╚════╝ ╚═╝  ╚═╝  ╚═══╝  ╚═╝╚═════╝ ╚═╝  ╚═══╝╚══════╝   ╚═╝   
+     ██║███████║██║   ██║██║██║  ██║██╔██╗ ██║█████╗     ██║
+██   ██║██╔══██║╚██╗ ██╔╝██║██║  ██║██║╚██╗██║██╔══╝     ██║
+╚█████╔╝██║  ██║ ╚████╔╝ ██║██████╔╝██║ ╚████║███████╗   ██║
+ ╚════╝ ╚═╝  ╚═╝  ╚═══╝  ╚═╝╚═════╝ ╚═╝  ╚═══╝╚══════╝   ╚═╝
 ```
 
-### The Eternal Network | شبکه جاوید
-
-**"اینترنت نمی‌میرد" — The Internet Never Dies**
+**A parallel internet built from satellite dishes, mesh radios, and HF radio.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
-[![Status](https://img.shields.io/badge/Status-Proposal-blue.svg)]()
+[![Python](https://img.shields.io/badge/Python-3.10+-green.svg)]()
+[![Status](https://img.shields.io/badge/Status-Blueprint-orange.svg)]()
 
 </div>
 
----
-
-## 🌐 Language | زبان
-
-- [English](#english)
-- [فارسی (Persian)](#فارسی-persian)
+**[فارسی (Persian)](README.fa.md)**
 
 ---
 
-# English
+## What is JavidNet?
 
-## 📖 Table of Contents
+When a government shuts down the internet, circumvention tools break. VPNs, proxies, Tor bridges all depend on the government's infrastructure to carry traffic. Block the pipes, and every tool that runs inside those pipes dies.
 
-- [Overview](#overview)
-- [The Problem](#the-problem)
-- [Our Vision](#our-vision)
-- [Technical Architecture](#technical-architecture)
-- [Implementation Phases](#implementation-phases)
-- [Challenges & Mitigations](#challenges--mitigations)
-- [Bandwidth Analysis](#bandwidth-analysis)
-- [How to Contribute](#how-to-contribute)
-- [Disclaimer](#disclaimer)
+JavidNet does not run inside the pipes.
 
----
+JavidNet is a **parallel internet**, a complete replacement for the domestic network. It combines two independent communication channels:
 
-## Overview
+1. **Starlink Mesh Network** - satellite dishes + local mesh radios (Wi-Fi, BLE, LoRa) for real-time internet access
+2. **HF Radio Communication** - shortwave radio via ionospheric skywave for text messaging and email when even satellite is unavailable
 
-**JavidNet** (جاویدنت - "Eternal Network") is a proposal for a people-managed, decentralized internet infrastructure designed to maintain connectivity during complete internet shutdowns. 
+Traffic never touches the government's infrastructure. There is nothing to block, nothing to filter, nothing to throttle.
 
-This project outlines a technical framework for routing internal network traffic through satellite exit nodes, enabling citizens to access the global internet even when traditional ISP connections are severed.
+## Architecture
 
-> **Note:** This is a conceptual proposal and technical discussion document. Implementation requires careful consideration of local laws, safety implications, and operational security.
+![JavidNet Main Architecture](png/javid-net-Slim---Main-Architecture.png)
 
----
+The system has three zones:
 
-## The Problem
+**Open Internet** - websites, messaging services (Signal, Telegram), email servers. Everything accessible through the global internet.
 
-During times of civil unrest, governments may implement complete internet blackouts, cutting off millions of people from:
+**Satellite Zone** - hidden Starlink dishes connected to gateway nodes. These are the exit points from JavidNet to the open internet. Each gateway runs a content cache, DNS resolver, traffic shaper, and bandwidth fairness system.
 
-- 📰 **News and information** — Access to independent journalism and global news
-- 👨‍👩‍👧‍👦 **Family communication** — Contact with loved ones abroad
-- 🏥 **Emergency services** — Coordination during crises
-- 💼 **Economic activity** — Business operations, banking, commerce
-- 🗣️ **Free expression** — The fundamental right to communicate
+**Mesh Zone** - a local radio network connecting users to the nearest gateway. Users run a SOCKS5 proxy on their devices. Traffic hops across the mesh from device to device until it reaches a satellite gateway.
 
-**Critical observation:** During these shutdowns, *internal networks often remain operational*. Domestic services, banking apps, and local websites continue to function. This creates an opportunity.
+The government's internet is not used at any point in this chain.
 
----
+## Data Flow
 
-## Our Vision
+![JavidNet Data Flow](png/javid-net-Dataflow.png)
 
-### Core Principles
+A single web request flows through seven steps:
 
-| Principle | Description |
-|-----------|-------------|
-| **Decentralized** | No single point of control or failure |
-| **People-Managed** | Operated by citizens, for citizens |
-| **Resilient** | Designed to survive targeted attacks |
-| **Accessible** | Simple enough for non-technical users |
-| **Secure** | Privacy-preserving by design |
+1. Client encrypts request
+2. Routes to internal bridge via mesh
+3. Bridge forwards to Starlink gateway
+4. Starlink satellite link (bypasses all domestic infrastructure)
+5. Starlink receives response from internet
+6. Bridge forwards response to client
+7. Client decrypts response
 
-### The Concept
+## Exit Node Setup
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     GLOBAL INTERNET                          │
-└─────────────────────────────────────────────────────────────┘
-                              ▲
-                              │ Satellite Link
-                              │ (Bypasses ISP control)
-                    ┌─────────┴─────────┐
-                    │  STARLINK EXIT    │
-                    │      NODES        │
-                    │  (Hidden within   │
-                    │   the country)    │
-                    └─────────┬─────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│              INTERNAL NETWORK (Still operational)            │
-│  ┌─────────┐    ┌─────────┐    ┌─────────┐                  │
-│  │ Bridge  │◄──►│ Bridge  │◄──►│ Bridge  │  Snowflake-style │
-│  │ Server  │    │ Server  │    │ Server  │  relay network   │
-│  └────┬────┘    └────┬────┘    └────┬────┘                  │
-│       │              │              │                        │
-│       └──────────────┼──────────────┘                        │
-│                      ▼                                       │
-│              ┌───────────────┐                               │
-│              │    USERS      │                               │
-│              │  (Millions)   │                               │
-│              └───────────────┘                               │
-└─────────────────────────────────────────────────────────────┘
-```
+![Starlink Exit Node Setup](png/javid-net-Starlink-Exit-Node-Setup.png)
 
-**The key insight:** Use satellite internet terminals as "exit nodes" that bridge the functioning internal network to the global internet.
+Each exit node consists of a Starlink dish, a router/PC, and bridge server software. The router has two network interfaces: one connected to the Starlink dish (satellite uplink) and one connected to the domestic network (for receiving mesh traffic from users).
 
----
+## Client-Side Architecture
 
-## Technical Architecture
+![Client-Side Architecture](png/javid-net-Client-Side-Architecture.png)
 
-### System Components
+On the user side, a custom client application (similar to Snowflake) runs on the device. It connects to the browser/app via a local proxy interface and discovers internal bridges through DHT/Gossip protocol over the domestic network.
 
-#### 1. Satellite Exit Nodes
-Hidden Starlink (or similar satellite internet) terminals that provide the physical bridge to the global internet.
+## Protocol Layers
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                STARLINK EXIT NODE                        │
-│  ┌──────────┐   ┌──────────┐   ┌──────────────────┐    │
-│  │ Satellite│   │  Router  │   │  Bridge Server   │    │
-│  │   Dish   │──►│    PC    │──►│  (Tor + Custom)  │    │
-│  └──────────┘   └──────────┘   └────────┬─────────┘    │
-│        ▲                                 │              │
-│        │ To Space                        ▼              │
-│                                  Internal Network       │
-└─────────────────────────────────────────────────────────┘
-```
-
-#### 2. Bridge Network
-A Snowflake-inspired relay system operating over the internal network:
-- **Bridge Servers** — Connect to exit nodes and distribute traffic
-- **Relay Nodes** — Volunteer-run nodes that forward encrypted traffic
-- **Client Software** — User-facing application for seamless access
-
-#### 3. Protocol Stack
+![Protocol Layers](png/javid-net-Protocol-Layers.png)
 
 | Layer | Function | Technology |
 |-------|----------|------------|
 | 5 | Application | HTTP/HTTPS, Signal, Telegram |
-| 4 | Encryption | TLS 1.3 + E2E encryption |
+| 4 | Encryption | TLS 1.3 + end-to-end encryption |
 | 3 | Obfuscation | Traffic shaping, domain fronting |
 | 2 | Relay | Modified Snowflake/WebRTC |
 | 1 | Transport | Internal network TCP/UDP |
-| 0 | Exit | Starlink → Global Internet |
+| 0 | Exit | Starlink to global internet |
 
-### Architecture Diagrams
+## Two Communication Channels
 
-Detailed technical diagrams are available in the `/diagrams` folder:
+### 1. Starlink Mesh Network
 
-| Diagram | Description |
-|---------|-------------|
-| `iran-starlink-architecture.drawio` | Complete system overview |
-| `iran-starlink-dataflow.drawio` | Request/response flow |
-| `iran-starlink-components.drawio` | Hardware & software components |
-| `iran-starlink-protocol-stack.drawio` | Protocol layers |
-| `iran-starlink-challenges.drawio` | Challenges and solutions |
-| `iran-starlink-bandwidth.drawio` | Bandwidth estimation |
+The primary channel. A mesh network of satellite dishes and local radios that provides real-time internet access to thousands of users simultaneously.
 
-> Open these files with [draw.io](https://app.diagrams.net/) or any compatible editor.
+Three node types make up the whole system:
 
----
+| Role | What it does | Hardware |
+|------|-------------|----------|
+| **LEAF** | End-user device. Runs SOCKS5 proxy at `127.0.0.1:1080` | Any phone/laptop/PC |
+| **HOP** | Relays traffic between nodes. Extends mesh range | Any device with Wi-Fi |
+| **GATEWAY** | Has a Starlink dish. Exits traffic to the real internet | RPi/PC + Starlink dish |
 
-## Implementation Phases
+Full concept and design rationale: **[Starlink Mesh Network - Concept](STARLINK_MESHNETWORK_README.md)** ([فارسی](STARLINK_MESHNETWORK_README.fa.md))
 
-### Phase 1: Foundation 🔬
-*Research and Development*
+Implementation source code and usage: **[starlink-meshnetwork/](starlink-meshnetwork/README.md)** ([فارسی](starlink-meshnetwork/README.fa.md))
 
-- [ ] Validate satellite internet bypass techniques
-- [ ] Develop bridge server software prototype
-- [ ] Design client application architecture
-- [ ] Establish secure communication channels for coordination
-- [ ] Identify potential hardware suppliers and logistics
+### 2. HF Radio Communication
 
-### Phase 2: Infrastructure 🛠️
-*Building the Network*
+The backup channel. Uses shortwave radio (3-30 MHz) and ionospheric skywave propagation to send text messages and email over distances of 1000-4000 km, completely bypassing all ground-based infrastructure.
 
-- [ ] Acquire and position satellite terminals
-- [ ] Deploy initial bridge servers
-- [ ] Establish encrypted inter-node communication
-- [ ] Implement DHT-based bridge discovery
-- [ ] Beta test with limited user group
+HF radio waves bounce off the ionosphere (F2 layer, ~300 km altitude) and land hundreds or thousands of kilometres away. A user in Tehran can reach Winlink email gateways in Turkey, Armenia, UAE, Kuwait, and beyond, using nothing more than a 5-10 watt radio and a thin wire antenna.
 
-### Phase 3: Scaling 📈
-*Expanding Access*
+No internet is needed at the sender's location. The gateway in the neighbouring country has internet and forwards messages to their final destination.
 
-- [ ] Recruit volunteer relay node operators
-- [ ] Distribute client software through secure channels
-- [ ] Implement caching and compression systems
-- [ ] Establish redundancy and failover procedures
-- [ ] Monitor and optimize network performance
+Full details and technical diagrams: **[HF Radio Diagrams](hf-radio-diagrams/README.md)** ([فارسی](hf-radio-diagrams/README.fa.md))
 
-### Phase 4: Resilience 🛡️
-*Hardening the Network*
+## Capacity Estimates
 
-- [ ] Implement advanced traffic obfuscation
-- [ ] Deploy countermeasures against detection
-- [ ] Establish backup exit node locations
-- [ ] Create emergency protocols
-- [ ] Document operational security procedures
+### Starlink Mesh
 
----
+| Dishes | Text/messaging | Optimised browsing | Standard browsing |
+|--------|-----------------|-------------------|-------------------|
+| 1 | 50,000 users | 2,000 users | 200 users |
+| 5 | 250,000 users | 10,000 users | 1,000 users |
+| 10 | 500,000 users | 20,000 users | 2,000 users |
 
-## Challenges & Mitigations
+These assume aggressive content optimisation and caching. Real numbers depend on usage patterns and cache hit rates.
 
-| Challenge | Risk Level | Mitigation Strategy |
-|-----------|------------|---------------------|
-| **Satellite dish detection** | 🔴 High | Hidden locations, camouflage, distributed placement |
-| **Bandwidth limitations** | 🟡 Medium | Aggressive caching, compression, text-priority queuing |
-| **Bridge discovery** | 🟡 Medium | DHT protocol, QR codes, Bluetooth bootstrap |
-| **Traffic analysis** | 🟡 Medium | Traffic shaping, mimicking allowed services |
-| **Single point of failure** | 🔴 High | Multiple exit nodes, automatic failover |
-| **Hardware logistics** | 🔴 High | Pre-positioning, trusted supply chains |
-| **Operational security** | 🔴 High | Compartmentalization, encrypted communications |
+### HF Radio
 
----
+| Mode | Speed | Use case |
+|------|-------|----------|
+| VARA HF | 200-2000 bps | Email, short messages |
+| ARDOP | 200-500 bps | Email, short messages |
+| JS8Call | ~50 bps | Short text, beacon |
+| FT8 | ~5 bps | Signal confirmation only |
 
-## Bandwidth Analysis
+HF radio is not a replacement for broadband. It is a lifeline for text communication when everything else is down.
 
-### Assumptions
-- 5 Starlink terminals (100 Mbps down / 20 Mbps up each)
-- Total capacity: ~500 Mbps download, ~100 Mbps upload
+## Project Structure
 
-### Capacity Estimates
+```
+javid-net/
+├── README.md                          # This file (English)
+├── README.fa.md                       # This file (Farsi)
+├── STARLINK_MESHNETWORK_README.md     # Starlink mesh concept & design (English)
+├── STARLINK_MESHNETWORK_README.fa.md  # Starlink mesh concept & design (Farsi)
+├── LICENSE                            # MIT licence
+├── javid-net.drawio                   # Main architecture diagram source
+├── png/                               # Main architecture diagram exports
+│   ├── javid-net-Main-Architecture.png
+│   ├── javid-net-Slim---Main-Architecture.png
+│   ├── javid-net-Dataflow.png
+│   ├── javid-net-Starlink-Exit-Node-Setup.png
+│   ├── javid-net-Client-Side-Architecture.png
+│   └── javid-net-Protocol-Layers.png
+├── starlink-meshnetwork/              # Mesh network implementation (Python)
+│   ├── README.md                      # Code-level documentation (English)
+│   ├── README.fa.md                   # Code-level documentation (Farsi)
+│   ├── javidnet.py                    # CLI entry point
+│   ├── core/node.py                   # Mesh node, peer discovery, routing
+│   ├── gateway/satellite.py           # Satellite uplink, cache, DNS, shaper
+│   ├── trust/chain.py                 # Web of trust, QR onboarding
+│   ├── optimizer/content.py           # Content compression & optimisation
+│   ├── resilience/store_forward.py    # Queue, retry, sneakernet, wipe
+│   ├── proxy/local.py                 # SOCKS5 proxy entry point
+│   ├── mesh/                          # Wi-Fi, BLE, LoRa transports
+│   ├── requirements.txt
+│   └── diagrams/                      # Architecture diagrams
+│       ├── 01-architecture.drawio
+│       ├── 02-dataflow.drawio
+│       ├── 03-trust-chain.drawio
+│       ├── 04-optimization.drawio
+│       ├── 05-resilience.drawio
+│       └── png/                       # Exported diagram images
+├── hf-radio-diagrams/                 # HF radio technical diagrams
+│   ├── README.md                      # HF radio documentation (English)
+│   ├── README.fa.md                   # HF radio documentation (Farsi)
+│   ├── *.drawio                       # Diagram source files (English)
+│   ├── png/                           # Exported English diagrams
+│   └── farsi/                         # Farsi versions
+│       ├── *.drawio                   # Diagram source files (Farsi)
+│       └── png/                       # Exported Farsi diagrams
+└── scripts/                           # Utility scripts
+```
 
-| Usage Type | Bandwidth/User | Concurrent Users |
-|------------|----------------|------------------|
-| Text-only (messaging, news) | ~50 Kbps | 2,000 - 10,000 |
-| Mixed (light browsing) | ~200 Kbps | 500 - 2,500 |
-| Heavy (video, large files) | ~500 Kbps | 200 - 1,000 |
+## Install
 
-### Realistic Use Cases
+```bash
+git clone https://github.com/user/javid-net.git
+cd javid-net/starlink-meshnetwork
+pip install -r requirements.txt
+```
 
-✅ **Viable:**
-- Text messaging (Signal, Telegram, WhatsApp)
-- News reading and web browsing
-- Email communication
-- Coordination and organization
-- Low-resolution image sharing
+Only one required dependency: `cryptography` (for Curve25519 + Ed25519). Everything else is pure Python or optional.
 
-⚠️ **Limited:**
-- Voice calls (compressed)
-- Social media (text-focused)
-- Document sharing
-- Video streaming
-- Video calls
-- Large file downloads
-- Software updates
+## Usage
 
----
+```bash
+# End user (connect and browse)
+python javidnet.py leaf --socks-port 1080
+
+# Relay (help traffic reach gateways)
+python javidnet.py hop
+
+# Satellite gateway operator
+python javidnet.py gateway --cache-size 2000 --max-sessions 200
+```
+
+Then configure your apps:
+
+| App | Setting |
+|-----|---------|
+| Firefox | Settings > Network > Proxy > SOCKS5 `127.0.0.1:1080` |
+| Chrome | `--proxy-server=socks5://127.0.0.1:1080` |
+| Telegram | Settings > Data > Proxy > SOCKS5 `127.0.0.1:1080` |
+| Signal | Uses system proxy |
+| curl | `curl --proxy socks5h://127.0.0.1:1080 https://example.com` |
 
 ## How to Contribute
 
 We welcome contributions from:
 
-- **Network Engineers** — Protocol design, optimization
-- **Security Researchers** — Threat modeling, penetration testing
-- **Software Developers** — Client/server application development
-- **UX Designers** — Making the system accessible to all users
-- **Technical Writers** — Documentation in multiple languages
-- **Translators** — Expanding reach to more communities
+- **Network engineers** - protocol design, optimisation
+- **Security researchers** - threat modelling, penetration testing
+- **Software developers** - client/server application development
+- **Hardware hackers** - antenna design, radio interface builds
+- **Translators** - expanding documentation to more languages
+- **Amateur radio operators** - Winlink gateway operation, HF testing
 
-### Ways to Help
+Ways to help:
 
-1. **Review the architecture** — Identify flaws, suggest improvements
-2. **Contribute code** — See open issues for current needs
-3. **Test and report** — Help identify bugs and vulnerabilities
-4. **Spread awareness** — Share with those who might benefit
-5. **Donate resources** — Hardware, hosting, development time
-
-### Code of Conduct
-
-- This project is for humanitarian purposes only
-- We do not support or encourage any illegal activity
-- Safety of users and operators is the top priority
-- All contributions must maintain user privacy
-
----
+1. Review the architecture and identify flaws
+2. Contribute code (see starlink-meshnetwork/ for the implementation)
+3. Test and report bugs
+4. Build and test HF radio setups
+5. Spread awareness with those who might benefit
 
 ## Disclaimer
 
-⚠️ **Important Legal Notice**
-
-This repository contains a **technical proposal and discussion document**. The information provided is for educational and research purposes.
+This repository contains a **technical proposal and discussion document**. The information is for educational and research purposes.
 
 - Implementation may be illegal in certain jurisdictions
 - Users and operators assume all risks
 - The authors provide no warranty and accept no liability
-- Always consult local laws before taking any action
-- Prioritize personal safety above all else
+- Always check local laws before taking any action
+- Prioritise personal safety above all else
 
-This project is motivated by the fundamental human right to access information and communicate freely, as recognized by Article 19 of the Universal Declaration of Human Rights.
+This project is motivated by the fundamental human right to access information and communicate freely, as recognised by Article 19 of the Universal Declaration of Human Rights.
 
----
+## Licence
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT Licence. See the [LICENSE](LICENSE) file for details.
 
 ---
 
-<div align="center">
-
-**"در تاریکی، یک چراغ کافیست"**
-
-*"In darkness, one light is enough"*
-
-</div>
-
----
----
----
-
-# فارسی (Persian)
-
-<div dir="rtl">
-
-## 📖 فهرست مطالب
-
-- [معرفی](#معرفی)
-- [مشکل](#مشکل)
-- [چشم‌انداز ما](#چشم‌انداز-ما)
-- [معماری فنی](#معماری-فنی)
-- [مراحل اجرا](#مراحل-اجرا)
-- [چالش‌ها و راه‌حل‌ها](#چالش‌ها-و-راه‌حل‌ها)
-- [تحلیل پهنای باند](#تحلیل-پهنای-باند)
-- [چگونه مشارکت کنیم](#چگونه-مشارکت-کنیم)
-- [سلب مسئولیت](#سلب-مسئولیت)
-
----
-
-## معرفی
-
-**جاویدنت** (JavidNet) یک پیشنهاد برای زیرساخت اینترنت غیرمتمرکز و مردم‌محور است که برای حفظ اتصال در زمان قطعی کامل اینترنت طراحی شده است.
-
-این پروژه یک چارچوب فنی برای مسیریابی ترافیک شبکه داخلی از طریق گره‌های خروجی ماهواره‌ای ارائه می‌دهد که به شهروندان امکان دسترسی به اینترنت جهانی را حتی در زمان قطع اتصالات ISP سنتی می‌دهد.
-
-> **توجه:** این یک پیشنهاد مفهومی و سند بحث فنی است. اجرای آن نیاز به بررسی دقیق قوانین محلی، پیامدهای امنیتی و امنیت عملیاتی دارد.
-
----
-
-## مشکل
-
-در زمان ناآرامی‌های مدنی، دولت‌ها ممکن است قطعی کامل اینترنت را اعمال کنند و میلیون‌ها نفر را از موارد زیر محروم کنند:
-
-- 📰 **اخبار و اطلاعات** — دسترسی به روزنامه‌نگاری مستقل و اخبار جهانی
-- 👨‍👩‍👧‍👦 **ارتباط خانوادگی** — تماس با عزیزان در خارج از کشور
-- 🏥 **خدمات اضطراری** — هماهنگی در بحران‌ها
-- 💼 **فعالیت اقتصادی** — عملیات تجاری، بانکداری، تجارت
-- 🗣️ **آزادی بیان** — حق اساسی برقراری ارتباط
-
-**مشاهده کلیدی:** در طول این قطعی‌ها، *شبکه‌های داخلی اغلب فعال می‌مانند*. سرویس‌های داخلی، اپلیکیشن‌های بانکی و وب‌سایت‌های محلی همچنان کار می‌کنند. این یک فرصت ایجاد می‌کند.
-
----
-
-## چشم‌انداز ما
-
-### اصول اساسی
-
-| اصل | توضیح |
-|-----|-------|
-| **غیرمتمرکز** | بدون نقطه کنترل یا شکست واحد |
-| **مردم‌محور** | توسط شهروندان، برای شهروندان |
-| **مقاوم** | طراحی شده برای مقاومت در برابر حملات هدفمند |
-| **در دسترس** | به اندازه کافی ساده برای کاربران غیرفنی |
-| **امن** | حفظ حریم خصوصی در طراحی |
-
-### مفهوم اصلی
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     اینترنت جهانی                            │
-└─────────────────────────────────────────────────────────────┘
-                              ▲
-                              │ لینک ماهواره‌ای
-                              │ (دور زدن کنترل ISP)
-                    ┌─────────┴─────────┐
-                    │   گره‌های خروجی   │
-                    │    استارلینک      │
-                    │  (مخفی در داخل    │
-                    │      کشور)        │
-                    └─────────┬─────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────┐
-│           شبکه داخلی (همچنان فعال)                          │
-│  ┌─────────┐    ┌─────────┐    ┌─────────┐                  │
-│  │ سرور   │◄──►│ سرور   │◄──►│ سرور   │  شبکه رله        │
-│  │  پل    │    │  پل    │    │  پل    │  نوع Snowflake   │
-│  └────┬────┘    └────┬────┘    └────┬────┘                  │
-│       │              │              │                        │
-│       └──────────────┼──────────────┘                        │
-│                      ▼                                       │
-│              ┌───────────────┐                               │
-│              │   کاربران    │                               │
-│              │  (میلیون‌ها) │                               │
-│              └───────────────┘                               │
-└─────────────────────────────────────────────────────────────┘
-```
-
-**بینش کلیدی:** استفاده از ترمینال‌های اینترنت ماهواره‌ای به عنوان "گره‌های خروجی" که شبکه داخلی فعال را به اینترنت جهانی متصل می‌کنند.
-
----
-
-## معماری فنی
-
-### اجزای سیستم
-
-#### ۱. گره‌های خروجی ماهواره‌ای
-ترمینال‌های استارلینک (یا اینترنت ماهواره‌ای مشابه) مخفی که پل فیزیکی به اینترنت جهانی را فراهم می‌کنند.
-
-#### ۲. شبکه پل
-یک سیستم رله الهام گرفته از Snowflake که روی شبکه داخلی کار می‌کند:
-- **سرورهای پل** — اتصال به گره‌های خروجی و توزیع ترافیک
-- **گره‌های رله** — گره‌های داوطلبانه که ترافیک رمزگذاری شده را فوروارد می‌کنند
-- **نرم‌افزار کلاینت** — برنامه کاربرپسند برای دسترسی بدون دردسر
-
-#### ۳. پشته پروتکل
-
-| لایه | عملکرد | فناوری |
-|------|--------|--------|
-| ۵ | برنامه | HTTP/HTTPS، سیگنال، تلگرام |
-| ۴ | رمزگذاری | TLS 1.3 + رمزگذاری E2E |
-| ۳ | مبهم‌سازی | شکل‌دهی ترافیک، domain fronting |
-| ۲ | رله | Snowflake/WebRTC اصلاح شده |
-| ۱ | انتقال | TCP/UDP شبکه داخلی |
-| ۰ | خروج | استارلینک ← اینترنت جهانی |
-
-### نمودارهای معماری
-
-نمودارهای فنی دقیق در پوشه `/diagrams` موجود است:
-
-| نمودار | توضیح |
-|--------|-------|
-| `iran-starlink-architecture.drawio` | نمای کلی سیستم |
-| `iran-starlink-dataflow.drawio` | جریان درخواست/پاسخ |
-| `iran-starlink-components.drawio` | اجزای سخت‌افزاری و نرم‌افزاری |
-| `iran-starlink-protocol-stack.drawio` | لایه‌های پروتکل |
-| `iran-starlink-challenges.drawio` | چالش‌ها و راه‌حل‌ها |
-| `iran-starlink-bandwidth.drawio` | تخمین پهنای باند |
-
-> این فایل‌ها را با [draw.io](https://app.diagrams.net/) یا هر ویرایشگر سازگار باز کنید.
-
----
-
-## مراحل اجرا
-
-### فاز ۱: پایه‌گذاری 🔬
-*تحقیق و توسعه*
-
-- [ ] اعتبارسنجی تکنیک‌های دور زدن اینترنت ماهواره‌ای
-- [ ] توسعه نمونه اولیه نرم‌افزار سرور پل
-- [ ] طراحی معماری برنامه کلاینت
-- [ ] ایجاد کانال‌های ارتباطی امن برای هماهنگی
-- [ ] شناسایی تامین‌کنندگان سخت‌افزار و لجستیک
-
-### فاز ۲: زیرساخت 🛠️
-*ساخت شبکه*
-
-- [ ] تهیه و جایگذاری ترمینال‌های ماهواره‌ای
-- [ ] استقرار سرورهای پل اولیه
-- [ ] ایجاد ارتباط رمزگذاری شده بین گره‌ها
-- [ ] پیاده‌سازی کشف پل مبتنی بر DHT
-- [ ] تست بتا با گروه کاربری محدود
-
-### فاز ۳: گسترش 📈
-*افزایش دسترسی*
-
-- [ ] جذب اپراتورهای داوطلب گره رله
-- [ ] توزیع نرم‌افزار کلاینت از طریق کانال‌های امن
-- [ ] پیاده‌سازی سیستم‌های کش و فشرده‌سازی
-- [ ] ایجاد رویه‌های افزونگی و failover
-- [ ] نظارت و بهینه‌سازی عملکرد شبکه
-
-### فاز ۴: مقاوم‌سازی 🛡️
-*تقویت شبکه*
-
-- [ ] پیاده‌سازی مبهم‌سازی پیشرفته ترافیک
-- [ ] استقرار اقدامات متقابل در برابر شناسایی
-- [ ] ایجاد مکان‌های پشتیبان گره خروجی
-- [ ] ایجاد پروتکل‌های اضطراری
-- [ ] مستندسازی رویه‌های امنیت عملیاتی
-
----
-
-## چالش‌ها و راه‌حل‌ها
-
-| چالش | سطح ریسک | استراتژی کاهش |
-|------|----------|---------------|
-| **شناسایی دیش ماهواره** | 🔴 بالا | مکان‌های مخفی، استتار، توزیع پراکنده |
-| **محدودیت پهنای باند** | 🟡 متوسط | کش تهاجمی، فشرده‌سازی، اولویت‌بندی متن |
-| **کشف پل** | 🟡 متوسط | پروتکل DHT، کدهای QR، بوت‌استرپ بلوتوث |
-| **تحلیل ترافیک** | 🟡 متوسط | شکل‌دهی ترافیک، تقلید سرویس‌های مجاز |
-| **نقطه شکست واحد** | 🔴 بالا | چندین گره خروجی، failover خودکار |
-| **لجستیک سخت‌افزار** | 🔴 بالا | پیش‌موضع‌گیری، زنجیره تامین قابل اعتماد |
-| **امنیت عملیاتی** | 🔴 بالا | تفکیک، ارتباطات رمزگذاری شده |
-
----
-
-## تحلیل پهنای باند
-
-### فرضیات
-- ۵ ترمینال استارلینک (هر کدام ۱۰۰ مگابیت دانلود / ۲۰ مگابیت آپلود)
-- ظرفیت کل: ~۵۰۰ مگابیت دانلود، ~۱۰۰ مگابیت آپلود
-
-### تخمین ظرفیت
-
-| نوع استفاده | پهنای باند/کاربر | کاربران همزمان |
-|-------------|------------------|----------------|
-| فقط متن (پیام‌رسانی، اخبار) | ~۵۰ کیلوبیت | ۲,۰۰۰ - ۱۰,۰۰۰ |
-| ترکیبی (مرور سبک) | ~۲۰۰ کیلوبیت | ۵۰۰ - ۲,۵۰۰ |
-| سنگین (ویدیو، فایل بزرگ) | ~۵۰۰ کیلوبیت | ۲۰۰ - ۱,۰۰۰ |
-
-### موارد استفاده واقعی
-
-✅ **امکان‌پذیر:**
-- پیام‌رسانی متنی (سیگنال، تلگرام، واتساپ)
-- خواندن اخبار و مرور وب
-- ارتباط ایمیلی
-- هماهنگی و سازماندهی
-- اشتراک‌گذاری تصاویر با وضوح پایین
-
-⚠️ **محدود:**
-- تماس صوتی (فشرده شده)
-- شبکه‌های اجتماعی (متن‌محور)
-- اشتراک‌گذاری اسناد
-- پخش ویدیو
-- تماس تصویری
-- دانلود فایل‌های بزرگ
-- به‌روزرسانی نرم‌افزار
-
----
-
-## چگونه مشارکت کنیم
-
-ما از مشارکت موارد زیر استقبال می‌کنیم:
-
-- **مهندسان شبکه** — طراحی پروتکل، بهینه‌سازی
-- **محققان امنیت** — مدل‌سازی تهدید، تست نفوذ
-- **توسعه‌دهندگان نرم‌افزار** — توسعه برنامه کلاینت/سرور
-- **طراحان UX** — در دسترس کردن سیستم برای همه کاربران
-- **نویسندگان فنی** — مستندسازی به چندین زبان
-- **مترجمان** — گسترش دسترسی به جوامع بیشتر
-
-### راه‌های کمک
-
-۱. **بررسی معماری** — شناسایی نقص‌ها، پیشنهاد بهبود
-۲. **مشارکت در کد** — مشاهده issues باز برای نیازهای فعلی
-۳. **تست و گزارش** — کمک به شناسایی باگ‌ها و آسیب‌پذیری‌ها
-۴. **گسترش آگاهی** — اشتراک‌گذاری با کسانی که ممکن است بهره‌مند شوند
-۵. **اهدای منابع** — سخت‌افزار، هاستینگ، زمان توسعه
-
-### منشور رفتاری
-
-- این پروژه فقط برای اهداف انسان‌دوستانه است
-- ما از هیچ فعالیت غیرقانونی حمایت یا تشویق نمی‌کنیم
-- امنیت کاربران و اپراتورها اولویت اصلی است
-- همه مشارکت‌ها باید حریم خصوصی کاربر را حفظ کنند
-
----
-
-## سلب مسئولیت
-
-⚠️ **اطلاعیه قانونی مهم**
-
-این مخزن شامل **پیشنهاد فنی و سند بحث** است. اطلاعات ارائه شده برای اهداف آموزشی و تحقیقاتی است.
-
-- اجرا ممکن است در برخی حوزه‌های قضایی غیرقانونی باشد
-- کاربران و اپراتورها همه ریسک‌ها را می‌پذیرند
-- نویسندگان هیچ ضمانتی نمی‌دهند و هیچ مسئولیتی نمی‌پذیرند
-- همیشه قبل از هر اقدامی قوانین محلی را بررسی کنید
-- امنیت شخصی را بالاتر از همه چیز قرار دهید
-
-این پروژه با انگیزه حق اساسی بشر برای دسترسی به اطلاعات و ارتباط آزادانه، همانطور که در ماده ۱۹ اعلامیه جهانی حقوق بشر به رسمیت شناخته شده، ایجاد شده است.
-
----
-
-## مجوز
-
-این پروژه تحت مجوز MIT منتشر شده است - فایل [LICENSE](LICENSE) را برای جزئیات ببینید.
-
----
-
-<div align="center">
-
-**"در تاریکی، یک چراغ کافیست"**
-
-*"In darkness, one light is enough"*
-
----
-
-**جاویدنت — شبکه جاوید**
-
-**JavidNet — The Eternal Network**
-
-🌐 💚 🤍 ❤️
-
-</div>
-
-</div>
-
----
-
-## 📁 Repository Structure
-
-```
-javidnet/
-├── README.md                              # This file
-├── LICENSE                                # MIT License
-├── diagrams/
-│   ├── iran-starlink-architecture.drawio  # Main architecture
-│   ├── iran-starlink-dataflow.drawio      # Data flow
-│   ├── iran-starlink-components.drawio    # Components
-│   ├── iran-starlink-protocol-stack.drawio# Protocol stack
-│   ├── iran-starlink-challenges.drawio    # Challenges
-│   └── iran-starlink-bandwidth.drawio     # Bandwidth analysis
-├── docs/
-│   ├── technical-spec.md                  # Detailed technical specification
-│   ├── security-model.md                  # Security considerations
-│   └── operational-guide.md               # Operational procedures
-├── src/
-│   ├── bridge-server/                     # Bridge server implementation
-│   ├── client/                            # Client application
-│   └── relay-node/                        # Relay node software
-└── research/
-    ├── satellite-bypass.md                # Satellite bypass research
-    ├── traffic-obfuscation.md             # Traffic obfuscation techniques
-    └── related-projects.md                # Related projects and prior art
-```
-
----
-
-<div align="center">
-
-**Built with ❤️ for the people**
-
-**ساخته شده با ❤️ برای مردم**
-
-</div>
+In darkness, one light is enough.

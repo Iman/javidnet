@@ -1,0 +1,10 @@
+# JavidNet — Dependencies
+# Core (required)
+cryptography>=41.0         # Curve25519, ChaCha20, Ed25519
+
+# Content optimization (optional)
+Pillow>=10.0               # Image transcoding (WebP, resize)
+
+# Mesh transports (optional, hardware-dependent)
+# bleak>=0.21              # BLE mesh transport
+# pyserial>=3.5            # LoRa radio transport
