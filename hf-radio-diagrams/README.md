@@ -14,7 +14,7 @@ This folder contains technical diagrams and reference material for using HF (Hig
 
 HF radio is the backup channel for JavidNet. While the primary Starlink mesh network provides real-time internet access, HF radio provides a low-bandwidth but extremely resilient text communication channel that works even when satellite dishes are seized or jammed.
 
-The key insight: you do not need a gateway inside your country. You need a gateway reachable by radio signal. HF radio waves bounce off the ionosphere and land 1000-4000 km away, crossing borders, mountains, and network blocks without touching any ground infrastructure.
+You do not need a gateway inside your country. You need a gateway reachable by radio signal. HF radio waves bounce off the ionosphere and land 1000-4000 km away, crossing borders, mountains, and network blocks without touching any ground infrastructure.
 
 ## How Skywave Propagation Works
 
