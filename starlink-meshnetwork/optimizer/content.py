@@ -1,22 +1,22 @@
 """
-JavidNet — Content Optimizer
+JavidNet - Content Optimizer
 
 When 5 Starlink dishes serve 50,000 people, you can't afford to
 waste a single byte.  This module makes satellite bandwidth go
 10-50x further through:
 
-  1. COMPRESS  — gzip/brotli everything, strip bloat from web pages
-  2. TRANSCODE — downscale images (2MB JPEG → 40KB WebP), strip video
-  3. DEDUP     — if 100 people request BBC Persian, fetch it once
-  4. PREFETCH  — predict what people will want next, cache it ahead
-  5. PRIORITIZE — text first, images later, video only if bandwidth allows
+  1. COMPRESS  - gzip/brotli everything, strip bloat from web pages
+  2. TRANSCODE - downscale images (2MB JPEG → 40KB WebP), strip video
+  3. DEDUP     - if 100 people request BBC Persian, fetch it once
+  4. PREFETCH  - predict what people will want next, cache it ahead
+  5. PRIORITIZE - text first, images later, video only if bandwidth allows
 
 This is not a generic CDN.  It's purpose-built for the constraint:
 "5 satellite dishes, 50,000 users, during a crisis."
 
 Inspiration: Opera Mini's server-side rendering (compressed web
 for 2G networks).  But JavidNet goes further because the constraint
-is harder — it's not slow internet, it's SHARED internet.
+is harder - it's not slow internet, it's SHARED internet.
 """
 import io
 import re
@@ -45,10 +45,10 @@ class ContentType(IntEnum):
 
 class BandwidthMode(IntEnum):
     """Network capacity determines how aggressively we optimize."""
-    CRISIS = 1      # <1 Mbps shared — text only, maximum compression
-    TIGHT = 2       # 1-10 Mbps — text + tiny images, no scripts
-    NORMAL = 3      # 10-50 Mbps — compressed browsing
-    GENEROUS = 4    # 50+ Mbps — light optimization
+    CRISIS = 1      # <1 Mbps shared - text only, maximum compression
+    TIGHT = 2       # 1-10 Mbps - text + tiny images, no scripts
+    NORMAL = 3      # 10-50 Mbps - compressed browsing
+    GENEROUS = 4    # 50+ Mbps - light optimization
 
 
 @dataclass
@@ -119,7 +119,7 @@ class ContentOptimizer:
         Optimize HTML/JSON/XML/plain text.
 
         For HTML in CRISIS mode, this is aggressive:
-          - Strip all <script> tags (no JS — saves 60-80% of page size)
+          - Strip all <script> tags (no JS - saves 60-80% of page size)
           - Strip all <style> beyond basic readability
           - Inline tiny images as data URIs, strip large ones
           - Remove tracking pixels, ads, analytics
@@ -223,7 +223,7 @@ class ContentOptimizer:
             return self._compress(body)
 
         except ImportError:
-            # No Pillow — just compress the raw bytes
+            # No Pillow - just compress the raw bytes
             return self._compress(body)
         except Exception:
             return self._compress(body)
@@ -258,7 +258,7 @@ class ContentOptimizer:
         In GENEROUS: light compression
         """
         if self.mode <= BandwidthMode.TIGHT:
-            msg = b"[Media blocked — bandwidth reserved for text/messaging]"
+            msg = b"[Media blocked - bandwidth reserved for text/messaging]"
             return msg
 
         # Allow but compress

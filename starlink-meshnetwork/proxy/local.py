@@ -1,14 +1,14 @@
 """
-JavidNet — Local Proxy
+JavidNet - Local Proxy
 
 The user-facing entry point.  Run this on your phone/laptop,
 configure your apps to use SOCKS5 at 127.0.0.1:1080, and your
 traffic exits through JavidNet's satellite gateways.
 
 Supports:
-  • SOCKS5 (TCP CONNECT) — works with browsers, curl, most apps
-  • DNS tunneling — queries go through mesh, never touch domestic DNS
-  • Smart routing — picks the best gateway automatically
+  • SOCKS5 (TCP CONNECT) - works with browsers, curl, most apps
+  • DNS tunneling - queries go through mesh, never touch domestic DNS
+  • Smart routing - picks the best gateway automatically
 
 Setup:
   Firefox:  Settings → Network → Manual Proxy → SOCKS5 127.0.0.1:1080
@@ -107,7 +107,7 @@ class LocalProxy:
                     self._connect_fn(host, port), timeout=20,
                 )
             except Exception as e:
-                logger.debug(f"Connection failed: {host}:{port} — {e}")
+                logger.debug(f"Connection failed: {host}:{port} - {e}")
                 self._reply(writer, REP_UNREACHABLE)
                 return
 

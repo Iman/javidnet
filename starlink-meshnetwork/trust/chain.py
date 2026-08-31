@@ -1,5 +1,5 @@
 """
-JavidNet — Trust Chain
+JavidNet - Trust Chain
 
 How do you build a trusted network with no central authority,
 no certificate authority, no directory server, and no internet?
@@ -8,10 +8,10 @@ Answer: a web of trust with physical verification.
 
 The trust model:
 
-  Level 3: OPERATOR  — runs a gateway dish.  Self-declared.
-  Level 2: TRUSTED   — vouched by an operator.  Can vouch others.
-  Level 1: VOUCHED   — vouched by a trusted peer.  Can use the network.
-  Level 0: UNKNOWN   — can see beacons but can't route traffic.
+  Level 3: OPERATOR  - runs a gateway dish.  Self-declared.
+  Level 2: TRUSTED   - vouched by an operator.  Can vouch others.
+  Level 1: VOUCHED   - vouched by a trusted peer.  Can use the network.
+  Level 0: UNKNOWN   - can see beacons but can't route traffic.
 
 Onboarding flow:
   1. New user installs JavidNet → generates keypair → trust=0
@@ -68,7 +68,7 @@ class TrustDB:
     """
     Local trust database.  Stores vouches and computes trust levels.
 
-    Uses SQLite — a single file, no server, works offline.
+    Uses SQLite - a single file, no server, works offline.
     """
 
     def __init__(self, db_path: Optional[str] = None):
@@ -255,7 +255,7 @@ class TrustDB:
             logger.info(f"Cascade revocation: {dep_id} (vouched by revoked {target_id})")
 
         self._conn.commit()
-        logger.info(f"Revoked: {target_id} by {revoker_id} — reason: {reason}")
+        logger.info(f"Revoked: {target_id} by {revoker_id} - reason: {reason}")
         return True
 
     # ── QR code generation/parsing ────────────────────────

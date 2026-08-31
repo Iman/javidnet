@@ -1,15 +1,15 @@
 """
-JavidNet — Resilience Layer
+JavidNet - Resilience Layer
 
 What happens when the satellite goes down?  When the dish is seized?
 When all gateways in a city go offline?
 
 JavidNet doesn't crash.  It degrades gracefully:
 
-  Level 0: FULL        — satellite active, normal operation
-  Level 1: DEGRADED    — satellite intermittent, queue + retry
-  Level 2: MESH_ONLY   — no satellite, local mesh messaging still works
-  Level 3: SNEAKERNET  — no mesh connectivity, store for physical transfer
+  Level 0: FULL        - satellite active, normal operation
+  Level 1: DEGRADED    - satellite intermittent, queue + retry
+  Level 2: MESH_ONLY   - no satellite, local mesh messaging still works
+  Level 3: SNEAKERNET  - no mesh connectivity, store for physical transfer
 
 This module manages the transition between levels and ensures
 no message is lost during transitions.
@@ -91,7 +91,7 @@ class ResilienceManager:
         self._tasks.append(asyncio.create_task(self._drain_loop()))
         self._tasks.append(asyncio.create_task(self._expire_loop()))
         pending = self._pending_count()
-        logger.info(f"Resilience manager started — level={self.level.name}, "
+        logger.info(f"Resilience manager started - level={self.level.name}, "
                     f"queued={pending}")
 
     async def stop(self):

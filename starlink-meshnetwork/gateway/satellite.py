@@ -1,16 +1,16 @@
 """
-JavidNet — Satellite Gateway
+JavidNet - Satellite Gateway
 
 The gateway is the beating heart of JavidNet.  It's a machine
 connected to a Starlink dish that accepts encrypted tunnels from
 the mesh and forwards traffic to the open internet.
 
 What makes this fundamentally different from a VPN server:
-  • The upstream IS the satellite — not a datacenter, not an ISP
+  • The upstream IS the satellite - not a datacenter, not an ISP
   • Bandwidth is shared across an entire neighborhood/city
-  • Every byte has a real cost — so the gateway must be smart
+  • Every byte has a real cost - so the gateway must be smart
     about what gets priority
-  • The dish is physically illegal — so the gateway must detect
+  • The dish is physically illegal - so the gateway must detect
     compromise and self-destruct
 
 Architecture:
@@ -134,7 +134,7 @@ class Gateway:
         # Bandwidth reporter
         self._tasks.append(asyncio.create_task(self._stats_loop()))
 
-        logger.info(f"Gateway started — listening on :{self.config.mesh_listen_port}, "
+        logger.info(f"Gateway started - listening on :{self.config.mesh_listen_port}, "
                     f"satellite via {self.config.satellite_interface}")
 
     async def stop(self):
@@ -304,7 +304,7 @@ class Gateway:
             await session.writer.drain()
 
         except Exception as e:
-            # Connection failed — notify peer
+            # Connection failed - notify peer
             err_msg = json.dumps({"error": str(e)}).encode()
             frame = struct.pack(">HB", len(err_msg) + 1, 0xFF) + err_msg
             session.writer.write(frame)
@@ -320,7 +320,7 @@ class Gateway:
     async def _handle_dns(self, session: TunnelSession, payload: bytes):
         """
         Resolve DNS on behalf of a mesh peer.
-        Cache results aggressively — DNS is the #1 latency killer
+        Cache results aggressively - DNS is the #1 latency killer
         over satellite (500ms+ RTT).
         """
         import struct as st
@@ -500,8 +500,8 @@ class Gateway:
             return False
 
     async def _enter_degraded_mode(self):
-        """Satellite link is down — switch to store-and-forward."""
-        logger.warning("Entering degraded mode — queuing outbound traffic")
+        """Satellite link is down - switch to store-and-forward."""
+        logger.warning("Entering degraded mode - queuing outbound traffic")
         # Notify all connected peers
         for sid, session in self._sessions.items():
             try:
@@ -538,7 +538,7 @@ class Gateway:
         Destroys all keys, peer data, and cache.
         """
         import shutil
-        logger.critical("PANIC — wiping all data")
+        logger.critical("PANIC - wiping all data")
         javidnet_dir = Path.home() / ".javidnet"
         if javidnet_dir.exists():
             shutil.rmtree(javidnet_dir)
@@ -576,7 +576,7 @@ class ContentCache:
     """
     HTTP content cache for the gateway.
 
-    On a satellite link serving thousands, caching is not optional —
+    On a satellite link serving thousands, caching is not optional -
     it's the difference between 10 people and 1000 people.
 
     Strategy:

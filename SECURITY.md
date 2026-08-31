@@ -19,8 +19,8 @@ exploit. It is a search for a dish, a radio, or a name.
 
 There is a second reason particular to this repository. Most of it is a
 blueprint. A public report of a flaw in a design that nobody has built yet gives
-away the design's weak point before anyone can fix it, and buys the users
-nothing, because there is no deployment to protect.
+away the weak point before anyone can fix it. It buys the users nothing, because
+there is no deployment to protect.
 
 ## The threat model
 
@@ -121,8 +121,8 @@ anyone can contribute.
   README says the real numbers depend on usage and cache hit rates. A
   measurement that contradicts them is a very welcome issue, and it is not a
   security report.
-- **Bugs in Starlink, Winlink, llama.cpp, or the `cryptography` package.**
-  Report those upstream.
+- **Bugs in Starlink, in Winlink, or in the `cryptography` package.** Report
+  those upstream.
 
 ## What to put in a report
 

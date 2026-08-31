@@ -1,8 +1,8 @@
 """
-JavidNet — Mesh Node
+JavidNet - Mesh Node
 
-The fundamental unit of JavidNet.  Every device — phone, laptop,
-Raspberry Pi, router — runs a Node.  Nodes discover each other
+The fundamental unit of JavidNet.  Every device - phone, laptop,
+Raspberry Pi, router - runs a Node.  Nodes discover each other
 over local radio (Wi-Fi, BLE, LoRa) and cooperate to route traffic
 toward satellite gateways.
 
@@ -14,9 +14,9 @@ at any point.  JavidNet is a parallel network:
     └──BLE──▶ Phone ──Wi-Fi──▶ Router ─────────────────┘
 
 Roles:
-  LEAF     — originates traffic (phones, laptops)
-  HOP      — forwards traffic for others (any device with two+ radios)
-  GATEWAY  — has a satellite dish, exits traffic to the internet
+  LEAF     - originates traffic (phones, laptops)
+  HOP      - forwards traffic for others (any device with two+ radios)
+  GATEWAY  - has a satellite dish, exits traffic to the internet
 
 A single device can be LEAF + HOP simultaneously.
 """
@@ -39,7 +39,7 @@ JAVIDNET_DIR = Path.home() / ".javidnet"
 KEYS_DIR = JAVIDNET_DIR / "keys"
 
 # Protocol constants
-PROTOCOL_MAGIC = b"JN"           # 2 bytes — identifies JavidNet frames
+PROTOCOL_MAGIC = b"JN"           # 2 bytes - identifies JavidNet frames
 PROTOCOL_VERSION = 3
 MULTICAST_GROUP = "239.77.43.1"
 MESH_PORT = 7743
@@ -238,7 +238,7 @@ class Node:
     async def _send_frame(self, frame_type: int, payload: bytes,
                           ttl: int = MAX_TTL, flags: int = 0,
                           target_addr: Optional[Tuple[str, int]] = None):
-        """Send a frame — either unicast or multicast."""
+        """Send a frame - either unicast or multicast."""
         frame = self._build_frame(frame_type, payload, ttl, flags)
         self._stats["frames_sent"] += 1
         self._stats["bytes_out"] += len(frame)
@@ -329,7 +329,7 @@ class Node:
         await self._send_frame(FrameType.BEACON, payload, ttl=3)
 
     async def _on_beacon(self, src_id, payload, ttl, flags, addr):
-        """Handle incoming beacon — update peer table."""
+        """Handle incoming beacon - update peer table."""
         try:
             b = json.loads(payload)
         except (json.JSONDecodeError, UnicodeDecodeError):
@@ -386,7 +386,7 @@ class Node:
                     link_quality=peer.link_quality,
                 ))
             elif peer.hops_to_gateway < MAX_TTL:
-                # Indirect route — this peer can reach a gateway
+                # Indirect route - this peer can reach a gateway
                 metric = self._route_metric(peer, direct=False)
                 self._routes.append(RouteEntry(
                     gateway_id=f"via:{peer_id}",
@@ -456,10 +456,10 @@ class Node:
         dest_id = payload[:8]
 
         if dest_id == self.src_id:
-            # For us — deliver to tunnel layer
+            # For us - deliver to tunnel layer
             await self._deliver_local(payload[8:], flags)
         elif Role.HOP & self.roles or Role.GATEWAY & self.roles:
-            # Relay — forward toward gateway
+            # Relay - forward toward gateway
             route = self.best_route()
             if route:
                 peer = self._peers.get(route.next_hop)
@@ -514,7 +514,7 @@ class Node:
         If we know one, reply.  Otherwise, rebroadcast (with lower TTL).
         """
         if Role.GATEWAY & self.roles:
-            # We ARE a gateway — reply directly
+            # We ARE a gateway - reply directly
             reply = {
                 "gw": self.node_id,
                 "h": 0,
@@ -526,7 +526,7 @@ class Node:
                 target_addr=addr,
             )
         elif self._routes:
-            # We know a route — reply with our best
+            # We know a route - reply with our best
             best = self._routes[0]
             reply = {
                 "gw": best.gateway_id,
@@ -544,7 +544,7 @@ class Node:
             await self._send_frame(FrameType.ROUTE_REQUEST, payload, ttl=ttl - 1)
 
     async def _on_route_reply(self, src_id, payload, ttl, flags, addr):
-        """Process a route reply — add gateway to our routing table."""
+        """Process a route reply - add gateway to our routing table."""
         try:
             r = json.loads(payload)
         except Exception:
@@ -598,7 +598,7 @@ class Node:
             logger.info(f"Peer {target_id} vouched by {voucher_id} → trust={target.trust}")
 
     async def vouch_for(self, peer_id: str):
-        """Vouch for a peer — grant them trust based on our own level."""
+        """Vouch for a peer - grant them trust based on our own level."""
         vouch = {"from": self.node_id, "for": peer_id, "ts": int(time.time())}
         payload = json.dumps(vouch, separators=(",", ":")).encode()
         await self._send_frame(FrameType.TRUST_VOUCH, payload, ttl=3)
@@ -657,7 +657,7 @@ class Node:
         return (parts[0], int(parts[1]) if len(parts) > 1 else self.mesh_port)
 
     async def _decrypt(self, data: bytes) -> bytes:
-        """Decrypt incoming data (placeholder — see tunnel module)."""
+        """Decrypt incoming data (placeholder - see tunnel module)."""
         return data  # actual decryption in tunnel layer
 
     # ── Status ────────────────────────────────────────────

@@ -1,11 +1,11 @@
 """
-JavidNet — CLI Entry Point
+JavidNet - CLI Entry Point
 
 Start JavidNet in one of three modes:
 
-  $ javidnet leaf          # End user — connect and browse
-  $ javidnet hop           # Relay — help others reach gateways
-  $ javidnet gateway       # Operator — run a satellite exit
+  $ javidnet leaf          # End user - connect and browse
+  $ javidnet hop           # Relay - help others reach gateways
+  $ javidnet gateway       # Operator - run a satellite exit
 
 """
 import asyncio
@@ -32,7 +32,7 @@ async def run_leaf(args):
     async def connect_via_mesh(host, port):
         route = node.best_route()
         if not route:
-            raise ConnectionError("No gateway reachable — check mesh connectivity")
+            raise ConnectionError("No gateway reachable - check mesh connectivity")
         peer = node._peers.get(route.next_hop)
         addr = node._parse_addr(peer.addresses[0])
         return await asyncio.open_connection(addr[0], 7744)
@@ -40,7 +40,7 @@ async def run_leaf(args):
     proxy = LocalProxy(port=args.socks_port, connect_fn=connect_via_mesh)
     proxy_task = asyncio.create_task(proxy.serve())
 
-    logger.info(f"JavidNet leaf running — SOCKS5 proxy on 127.0.0.1:{args.socks_port}")
+    logger.info(f"JavidNet leaf running - SOCKS5 proxy on 127.0.0.1:{args.socks_port}")
     logger.info(f"Configure your apps: SOCKS5 → 127.0.0.1:{args.socks_port}")
 
     try:
@@ -56,11 +56,11 @@ async def run_leaf(args):
 
 
 async def run_hop(args):
-    """Start as a relay (hop) node — forward traffic for others."""
+    """Start as a relay (hop) node - forward traffic for others."""
     node = Node(roles=Role.LEAF | Role.HOP, mesh_port=args.port)
     await node.start()
 
-    logger.info("JavidNet hop running — relaying traffic for the mesh")
+    logger.info("JavidNet hop running - relaying traffic for the mesh")
 
     try:
         while True:
@@ -75,7 +75,7 @@ async def run_hop(args):
 
 
 async def run_gateway(args):
-    """Start as a satellite gateway — the internet exit."""
+    """Start as a satellite gateway - the internet exit."""
     from gateway.satellite import Gateway, GatewayConfig
 
     # Start mesh node with GATEWAY role
@@ -95,7 +95,7 @@ async def run_gateway(args):
     resilience = ResilienceManager()
     await resilience.start()
 
-    logger.info(f"JavidNet GATEWAY running — mesh:{args.port}, tunnels:{args.port + 1}")
+    logger.info(f"JavidNet GATEWAY running - mesh:{args.port}, tunnels:{args.port + 1}")
 
     try:
         while True:
@@ -116,21 +116,21 @@ async def run_gateway(args):
 def main():
     parser = argparse.ArgumentParser(
         prog="javidnet",
-        description="JavidNet — parallel internet via satellite mesh",
+        description="JavidNet - parallel internet via satellite mesh",
     )
     sub = parser.add_subparsers(dest="mode", required=True)
 
     # Leaf
-    leaf = sub.add_parser("leaf", help="End user — browse via JavidNet")
+    leaf = sub.add_parser("leaf", help="End user - browse via JavidNet")
     leaf.add_argument("--port", type=int, default=MESH_PORT, help="Mesh port")
     leaf.add_argument("--socks-port", type=int, default=1080, help="Local SOCKS5 port")
 
     # Hop
-    hop = sub.add_parser("hop", help="Relay — help traffic reach gateways")
+    hop = sub.add_parser("hop", help="Relay - help traffic reach gateways")
     hop.add_argument("--port", type=int, default=MESH_PORT, help="Mesh port")
 
     # Gateway
-    gw = sub.add_parser("gateway", help="Operator — satellite internet exit")
+    gw = sub.add_parser("gateway", help="Operator - satellite internet exit")
     gw.add_argument("--port", type=int, default=MESH_PORT, help="Mesh port")
     gw.add_argument("--cache-size", type=int, default=2000, help="Cache size MB")
     gw.add_argument("--max-sessions", type=int, default=200, help="Max concurrent users")
